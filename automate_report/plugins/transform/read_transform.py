@@ -2,26 +2,26 @@ import pandas as pd
 import glob
 import os
 
-# Mendefinisikan home directory di laptop kita
+# Define our laptop home directory 
 HOME = os.path.expanduser("~")
 
-# Untuk append semua csv, function ini tidak untuk di read di lain python file
+# this function is not readable in other python file (in order to append all csv files)
 def __append_all_files(extension, directory):
-    # read semua object file di directory data
+    # read all files object in data directory 
     all_filenames = [i for i in glob.glob(
         '{directory}/*.{ext}'.format(directory=directory, ext=extension))]
 
-    # append semua file ke dalam satu dataframe
+    # append all files into one dataframe
     combined_csv = pd.concat([pd.read_csv(f)
                              for f in all_filenames], ignore_index=True)
 
-    # cleaning kolom Quantity Ordered yang bernilai tidak valid
+    # Quantity Ordered column cleaning which has invalid value
     combined_csv.drop(
         combined_csv[combined_csv["Quantity Ordered"] == "Quantity Ordered"].index, inplace=True)
 
     return combined_csv
 
-# transformasi data, group by bisa di isi dengan product atau month
+# data transformation, group can be filled with product or month
 def run_transform(group_by):
     data = __append_all_files(
         'csv', 'data/sales_product_data')
@@ -32,7 +32,7 @@ def run_transform(group_by):
         float) * data["Price Each"].astype(float)
     data["Order Date"] = pd.to_datetime(data["Order Date"])
 
-    # drop Date yang null
+    # drop null Date 
     data.drop(
         data[data["Order Date"].isna()].index, inplace=True)
 
